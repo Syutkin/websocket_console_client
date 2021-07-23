@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'colorer.dart';
+
 class WebsocketClient {
   final _webSocketUrl;
 
@@ -12,27 +14,28 @@ class WebsocketClient {
   }
 
   void run() async {
-    print('${DateTime.now()}: Соединяемся с сервером $webSocketUrl ...');
+    stdout
+        .writeln('${DateTime.now()}: Соединяемся с сервером $webSocketUrl ...');
 
     var futureWebSocket = WebSocket.connect(webSocketUrl);
 
     await futureWebSocket.then((WebSocket ws) {
       _webSocket = ws;
-      print(
+      stdout.writeln(
           '${DateTime.now()}: Соединение установлено: ${_webSocket.readyState.toString()}');
 
       _webSocket.listen((data) {
-        print(data);
+        stdout.writeln(colorParser(data));
       }, onError: _error, onDone: _done);
     });
   }
 
   void _error(err) async {
-    print('${DateTime.now()}: ОШИБКА СОЕДИНЕНИЯ: $err');
+    stdout.writeln('${DateTime.now()}: ОШИБКА СОЕДИНЕНИЯ: $err');
   }
 
   void _done() async {
-    print('${DateTime.now()}: СОЕДИНЕНИЕ ЗАВЕРШЕНО! \n'
+    stdout.writeln('${DateTime.now()}: СОЕДИНЕНИЕ ЗАВЕРШЕНО! \n'
         'readyState=${_webSocket.readyState}\n'
         'closeCode= ${_webSocket.closeCode}\n'
         'closeReason=${_webSocket.closeReason}\n');
