@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:args/args.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'websocket_client.dart';
 
@@ -14,6 +15,8 @@ void main(List<String> arguments) {
     ..addOption(urlParamName, defaultsTo: _webSocketUrl);
 
   var argResults = parser.parse(arguments);
+
+  initializeDateFormatting('ru_RU', null).then((_) => null);
 
   var wsClient = WebsocketClient(argResults[urlParamName]);
 
