@@ -1,11 +1,12 @@
 import 'dart:io';
-
-import 'colorer.dart';
+import 'package:web_socket_channel/io.dart';
+// import 'package:web_socket_channel/status.dart' as status;
 
 class WebsocketClient {
   final _webSocketUrl;
 
-  late WebSocket _webSocket;
+  // late WebSocket _webSocket;
+  late IOWebSocketChannel _channel;
 
   String get webSocketUrl => _webSocketUrl;
 
@@ -17,17 +18,12 @@ class WebsocketClient {
     stdout
         .writeln('${DateTime.now()}: Соединяемся с сервером $webSocketUrl ...');
 
-    var futureWebSocket = WebSocket.connect(webSocketUrl);
+    _channel = IOWebSocketChannel.connect(Uri.parse(webSocketUrl));
 
-    await futureWebSocket.then((WebSocket ws) {
-      _webSocket = ws;
-      stdout.writeln(
-          '${DateTime.now()}: Соединение установлено: ${_webSocket.readyState.toString()}');
-
-      _webSocket.listen((data) {
-        stdout.writeln(colorParser(data));
-      }, onError: _error, onDone: _done);
-    });
+    _channel.stream.listen((message) {
+      stdout.writeln(message);
+      // channel.sink.close(status.goingAway);
+    }, onDone: _done, onError: _error);
   }
 
   void _error(err) async {
@@ -35,13 +31,10 @@ class WebsocketClient {
   }
 
   void _done() async {
-    stdout.writeln('${DateTime.now()}: СОЕДИНЕНИЕ ЗАВЕРШЕНО! \n'
-        'readyState=${_webSocket.readyState}\n'
-        'closeCode= ${_webSocket.closeCode}\n'
-        'closeReason=${_webSocket.closeReason}\n');
+    stdout.writeln('${DateTime.now()}: СОЕДИНЕНИЕ ЗАВЕРШЕНО! \n');
   }
 
   void sendws(String msg) {
-    _webSocket.add(msg);
+    _channel.sink.add(msg);
   }
 }
