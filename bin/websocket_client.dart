@@ -22,12 +22,11 @@ class WebsocketClient {
     stdout.writeln('${_timeStamp()}: Соединяемся с сервером $webSocketUrl ...');
 
     WebSocket.connect(webSocketUrl).then((webSocket) {
-      stdout.writeln(
-          '${_timeStamp()}: Соединение установлено');
+      stdout.writeln('${_timeStamp()}: Соединение установлено');
       _channel = IOWebSocketChannel(webSocket);
       _channel?.stream.listen((message) {
         stdout.writeln(message);
-      }, onDone: _done);
+      }, onDone: _done, onError: _error);
     }).catchError((err) {
       stdout.writeln('${_timeStamp()}: ОШИБКА СОЕДИНЕНИЯ: $err');
     });
@@ -35,6 +34,10 @@ class WebsocketClient {
 
   void _done() async {
     stdout.writeln('${_timeStamp()}}: СОЕДИНЕНИЕ ЗАВЕРШЕНО! \n');
+  }
+
+  void _error(err) async {
+    stdout.writeln('${_timeStamp()}: ОШИБКА СОЕДИНЕНИЯ: $err');
   }
 
   void sendws(String msg) {
